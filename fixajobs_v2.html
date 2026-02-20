@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GARÇA-JOBS v2.4 — Nova Vitória Network</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --cyan: #00f5ff;
+            --magenta: #ff00c8;
+            --green: #00ff88;
+            --red: #ff2244;
+            --gold: #ffd700;
+            --bg: #060a0f;
+            --bg2: #0a1018;
+            --bg3: #0d1520;
+            --border: rgba(0, 245, 255, 0.18);
+            --text: #b8d4e0;
+            --glow-c: 0 0 8px var(--cyan), 0 0 24px rgba(0, 245, 255, 0.3);
+            --glow-m: 0 0 8px var(--magenta), 0 0 24px rgba(255, 0, 200, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── SCANLINES ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 0, 0, 0.15) 2px,
+                    rgba(0, 0, 0, 0.15) 4px);
+            pointer-events: none;
+            z-index: 9999;
+            animation: scanmove 8s linear infinite;
+        }
+
+        @keyframes scanmove {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 0 40px;
+            }
+        }
+
+        /* ── CRT VIGNETTE ── */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.7) 100%);
+            pointer-events: none;
+            z-index: 9998;
+        }
+
+        /* ══════════════════════════════════
+       BOOT SCREEN
+    ══════════════════════════════════ */
+        #boot-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.2rem;
+            animation: bootFade 0.5s ease 3.8s forwards;
+        }
+
+        @keyframes bootFade {
+            to {
+                opacity: 0;
+                pointer-events: none;
+            }
+        }
+
+        .boot-logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.6rem, 4.5vw, 3rem);
+            font-weight: 900;
+            color: var(--cyan);
+            text-shadow: var(--glow-c);
+            letter-spacing: 0.15em;
+            animation: glitch 0.4s steps(2) 0.6s 3;
+        }
+
+        .boot-sub {
+            font-size: 0.88rem;
+            color: var(--magenta);
+            letter-spacing: 0.3em;
+            text-shadow: var(--glow-m);
+        }
+
+        .boot-bar {
+            width: min(380px, 80vw);
+            height: 4px;
+            background: rgba(0, 245, 255, 0.12);
+            border: 1px solid var(--cyan);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .boot-bar-fill {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--cyan), var(--magenta));
+            box-shadow: 0 0 12px var(--cyan);
+            animation: fillBar 3.2s cubic-bezier(0.4, 0, 0.8, 1) 0.5s forwards;
+        }
+
+        @keyframes fillBar {
+            to {
+                width: 100%;
+            }
+        }
+
+        .boot-lines {
+            font-size: 0.78rem;
+            color: rgba(0, 245, 255, 0.55);
+            text-align: left;
+            width: min(380px, 80vw);
+            line-height: 1.8;
+        }
+
+        .boot-line {
+            opacity: 0;
+            animation: lineIn 0.1s ease forwards;
+        }
+
+        .boot-line:nth-child(1) {
+            animation-delay: 0.3s;
+        }
+
+        .boot-line:nth-child(2) {
+            animation-delay: 0.7s;
+        }
+
+        .boot-line:nth-child(3) {
+            animation-delay: 1.1s;
+        }
+
+        .boot-line:nth-child(4) {
+            animation-delay: 1.5s;
+        }
+
+        .boot-line:nth-child(5) {
+            animation-delay: 2.0s;
+        }
+
+        .boot-line:nth-child(6) {
+            animation-delay: 2.5s;
+        }
+
+        .boot-line:nth-child(7) {
+            animation-delay: 3.0s;
+        }
+
+        @keyframes lineIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes glitch {
+            0% {
+                text-shadow: var(--glow-c);
+                transform: translate(0);
+            }
+
+            20% {
+                text-shadow: -3px 0 var(--magenta), 3px 0 var(--cyan);
+                transform: translate(-2px, 1px);
+            }
+
+            40% {
+                text-shadow: 3px 0 var(--magenta), -3px 0 var(--cyan);
+                transform: translate(2px, -1px);
+            }
+
+            60% {
+                text-shadow: var(--glow-c);
+                transform: translate(0);
+            }
+
+            80% {
+                text-shadow: -2px 0 var(--magenta);
+                transform: translate(1px, 0);
+            }
+
+            100% {
+                text-shadow: var(--glow-c);
+                transform: translate(0);
+            }
+        }
+
+        /* ══════════════════════════════════
+       DEVICE FRAME
+    ══════════════════════════════════ */
+        .device-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .device {
+            width: min(440px, 100vw);
+            min-height: 800px;
+            background: linear-gradient(160deg, #0b1520 0%, #060c14 100%);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 24px;
+            box-shadow:
+                0 0 0 1px rgba(0, 245, 255, 0.08),
+                0 0 40px rgba(0, 245, 255, 0.08),
+                inset 0 1px 0 rgba(0, 245, 255, 0.12);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* corner accents */
+        .device::before,
+        .device::after {
+            content: '';
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            border-color: var(--cyan);
+            border-style: solid;
+            opacity: 0.5;
+            z-index: 1;
+        }
+
+        .device::before {
+            top: 12px;
+            left: 12px;
+            border-width: 2px 0 0 2px;
+            border-radius: 4px 0 0 0;
+        }
+
+        .device::after {
+            bottom: 12px;
+            right: 12px;
+            border-width: 0 2px 2px 0;
+            border-radius: 0 0 4px 0;
+        }
+
+        /* ── STATUS BAR ── */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.7rem;
+            color: rgba(0, 245, 255, 0.5);
+            border-bottom: 1px solid rgba(0, 245, 255, 0.08);
+            letter-spacing: 0.12em;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--green);
+            border-radius: 50%;
+            box-shadow: 0 0 6px var(--green);
+            animation: pulse 2s ease infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.3
+            }
+        }
+
+        /* ── APP HEADER ── */
+        .app-header {
+            padding: 1rem 1.4rem 0.6rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .app-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--cyan);
+            text-shadow: var(--glow-c);
+            letter-spacing: 0.12em;
+        }
+
+        .app-subtitle {
+            font-size: 0.7rem;
+            color: var(--magenta);
+            letter-spacing: 0.2em;
+            margin-top: 2px;
+            text-shadow: 0 0 8px var(--magenta);
+        }
+
+        /* ── NAV TABS ── */
+        .nav-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1px;
+            background: rgba(0, 245, 255, 0.06);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: rgba(0, 245, 255, 0.4);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.68rem;
+            letter-spacing: 0.06em;
+            padding: 0.65rem 0.2rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-btn .tab-icon {
+            font-size: 1.3rem;
+        }
+
+        .tab-btn:hover {
+            color: var(--cyan);
+            background: rgba(0, 245, 255, 0.04);
+        }
+
+        .tab-btn.active {
+            color: var(--cyan);
+            border-bottom-color: var(--cyan);
+            background: rgba(0, 245, 255, 0.07);
+            text-shadow: 0 0 8px var(--cyan);
+        }
+
+        /* ── CONTENT AREA ── */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 1rem 1.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 245, 255, 0.3) transparent;
+        }
+
+        .content-area::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .content-area::-webkit-scrollbar-thumb {
+            background: rgba(0, 245, 255, 0.3);
+            border-radius: 2px;
+        }
+
+        /* ── SECTION PANEL ── */
+        .section-panel {
+            display: none;
+            animation: fadeSlide 0.3s ease;
+        }
+
+        .section-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── SECTION HEADER ── */
+        .section-header {
+            margin-bottom: 1rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--cyan);
+            text-shadow: var(--glow-c);
+            letter-spacing: 0.1em;
+        }
+
+        .section-note {
+            font-size: 0.68rem;
+            color: rgba(0, 245, 255, 0.45);
+            margin-top: 0.4rem;
+            line-height: 1.6;
+            border-left: 2px solid rgba(0, 245, 255, 0.3);
+            padding-left: 0.5rem;
+        }
+
+        /* ── JOB CARD ── */
+        .job-card {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.04) 0%, rgba(10, 16, 24, 0.95) 100%);
+            border: 1px solid rgba(0, 245, 255, 0.15);
+            border-radius: 8px;
+            margin-bottom: 0.9rem;
+            overflow: hidden;
+            cursor: pointer;
+            transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+            position: relative;
+        }
+
+        .job-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--cyan), var(--magenta));
+            opacity: 0.6;
+            transition: opacity 0.25s;
+        }
+
+        .job-card:hover {
+            border-color: rgba(0, 245, 255, 0.45);
+            box-shadow: 0 0 18px rgba(0, 245, 255, 0.12), inset 0 0 20px rgba(0, 245, 255, 0.03);
+            transform: translateY(-1px);
+        }
+
+        .job-card:hover::before {
+            opacity: 1;
+        }
+
+        /* special colours */
+        .job-card.danger {
+            border-color: rgba(255, 34, 68, 0.25);
+        }
+
+        .job-card.danger::before {
+            background: linear-gradient(to bottom, var(--red), var(--magenta));
+        }
+
+        .job-card.danger:hover {
+            border-color: rgba(255, 34, 68, 0.55);
+            box-shadow: 0 0 18px rgba(255, 34, 68, 0.15);
+        }
+
+        .job-card.gold-card {
+            border-color: rgba(255, 215, 0, 0.25);
+        }
+
+        .job-card.gold-card::before {
+            background: linear-gradient(to bottom, var(--gold), #ff8c00);
+        }
+
+        .job-card.gold-card:hover {
+            border-color: rgba(255, 215, 0, 0.5);
+            box-shadow: 0 0 18px rgba(255, 215, 0, 0.12);
+        }
+
+        /* card header */
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0.9rem 0.6rem 1rem;
+        }
+
+        .card-id {
+            font-size: 0.65rem;
+            color: rgba(0, 245, 255, 0.35);
+            letter-spacing: 0.1em;
+        }
+
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--cyan);
+        }
+
+        .job-card.danger .card-title {
+            color: var(--red);
+            text-shadow: 0 0 8px var(--red);
+        }
+
+        .job-card.gold-card .card-title {
+            color: var(--gold);
+            text-shadow: 0 0 8px var(--gold);
+        }
+
+        .card-reward-badge {
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            white-space: nowrap;
+        }
+
+        .badge-green {
+            background: rgba(0, 255, 136, 0.12);
+            color: var(--green);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .badge-red {
+            background: rgba(255, 34, 68, 0.12);
+            color: var(--red);
+            border: 1px solid rgba(255, 34, 68, 0.3);
+        }
+
+        .badge-gold {
+            background: rgba(255, 215, 0, 0.12);
+            color: var(--gold);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .badge-mag {
+            background: rgba(255, 0, 200, 0.12);
+            color: var(--magenta);
+            border: 1px solid rgba(255, 0, 200, 0.3);
+        }
+
+        /* card body */
+        .card-body {
+            display: none;
+            padding: 0 1rem 0.9rem 1rem;
+            animation: fadeSlide 0.2s ease;
+        }
+
+        .card-body.open {
+            display: block;
+        }
+
+        .card-divider {
+            height: 1px;
+            background: var(--border);
+            margin-bottom: 0.7rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0.3rem 0;
+            border-bottom: 1px solid rgba(0, 245, 255, 0.05);
+            gap: 0.5rem;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-key {
+            font-size: 0.68rem;
+            color: rgba(0, 245, 255, 0.45);
+            letter-spacing: 0.08em;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .info-val {
+            font-size: 0.72rem;
+            color: var(--text);
+            text-align: right;
+            line-height: 1.5;
+        }
+
+        .info-val.highlight {
+            color: var(--green);
+            font-weight: 700;
+        }
+
+        .info-val.danger-val {
+            color: var(--red);
+        }
+
+        .info-val.gold-val {
+            color: var(--gold);
+        }
+
+        .prize-block {
+            background: rgba(0, 245, 255, 0.03);
+            border: 1px solid rgba(0, 245, 255, 0.1);
+            border-radius: 5px;
+            padding: 0.5rem 0.7rem;
+            margin-top: 0.5rem;
+        }
+
+        .prize-label {
+            font-size: 0.65rem;
+            color: rgba(0, 245, 255, 0.4);
+            letter-spacing: 0.12em;
+            margin-bottom: 0.4rem;
+        }
+
+        .prize-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.2rem 0;
+            font-size: 0.75rem;
+        }
+
+        .prize-first {
+            color: var(--gold);
+        }
+
+        .prize-second {
+            color: #c0c0c0;
+        }
+
+        .prize-third {
+            color: #cd7f32;
+        }
+
+        /* locked badge */
+        .locked-badge {
+            font-size: 0.68rem;
+            color: var(--magenta);
+            background: rgba(255, 0, 200, 0.08);
+            border: 1px solid rgba(255, 0, 200, 0.25);
+            border-radius: 3px;
+            padding: 0.15rem 0.4rem;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* expand chevron */
+        .chevron {
+            font-size: 0.65rem;
+            color: rgba(0, 245, 255, 0.4);
+            transition: transform 0.2s;
+            margin-left: 0.4rem;
+        }
+
+        .job-card.expanded .chevron {
+            transform: rotate(180deg);
+        }
+
+        /* ── FOOTER ── */
+        .device-footer {
+            padding: 0.5rem 1.4rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.65rem;
+            color: rgba(0, 245, 255, 0.25);
+            letter-spacing: 0.1em;
+        }
+
+        .signal-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .bar {
+            width: 3px;
+            background: var(--cyan);
+            border-radius: 1px;
+            opacity: 0.6;
+        }
+
+        .bar:nth-child(1) {
+            height: 4px;
+        }
+
+        .bar:nth-child(2) {
+            height: 7px;
+        }
+
+        .bar:nth-child(3) {
+            height: 10px;
+        }
+
+        .bar:nth-child(4) {
+            height: 13px;
+        }
+
+        /* ── TICKER ── */
+        .ticker-wrap {
+            overflow: hidden;
+            background: rgba(0, 245, 255, 0.04);
+            border-top: 1px solid rgba(0, 245, 255, 0.08);
+            padding: 0.25rem 0;
+        }
+
+        .ticker {
+            white-space: nowrap;
+            display: inline-block;
+            font-size: 0.63rem;
+            color: rgba(0, 245, 255, 0.4);
+            animation: ticker 30s linear infinite;
+        }
+
+        @keyframes ticker {
+            from {
+                transform: translateX(100vw);
+            }
+
+            to {
+                transform: translateX(-100%);
+            }
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 460px) {
+            .device {
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+            }
+
+            .device-wrap {
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ░░ BOOT SCREEN ░░ -->
+    <div id="boot-screen">
+        <div class="boot-logo">GARÇA-JOBS v2.4</div>
+        <div class="boot-sub">NOVA VITÓRIA NETWORK</div>
+        <div class="boot-bar">
+            <div class="boot-bar-fill"></div>
+        </div>
+        <div class="boot-lines">
+            <div class="boot-line">&gt; Iniciando kernel NV-OS 7.1...</div>
+            <div class="boot-line">&gt; Conectando à rede segura...</div>
+            <div class="boot-line">&gt; Verificando certificado de identidade...</div>
+            <div class="boot-line">&gt; Carregando banco de jobs disponíveis...</div>
+            <div class="boot-line">&gt; Criptografia ativa — canal seguro.</div>
+            <div class="boot-line">&gt; 15 oportunidades encontradas. ✓</div>
+            <div class="boot-line" style="color:var(--green)">&gt; PRONTO. Bem-vindo, Fixa.</div>
+        </div>
+    </div>
+
+    <!-- ░░ DEVICE ░░ -->
+    <div class="device-wrap">
+        <div class="device">
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <span><span class="status-dot"></span> &nbsp;NV-NET</span>
+                <span>GARÇA-JOBS v2.4</span>
+                <span>SIG ▐▐▐▐ 87%</span>
+            </div>
+
+            <!-- App Header -->
+            <div class="app-header">
+                <div class="app-title">📡 GARÇA-JOBS</div>
+                <div class="app-subtitle">NOVA VITÓRIA NETWORK — OPORTUNIDADES ATIVAS</div>
+            </div>
+
+            <!-- Nav Tabs -->
+            <nav class="nav-tabs">
+                <button class="tab-btn active" onclick="switchTab('corridas', this)">
+                    <span class="tab-icon">🏎️</span><span>CORRIDAS</span>
+                </button>
+                <button class="tab-btn" onclick="switchTab('brawl', this)">
+                    <span class="tab-icon">👊</span><span>BRAWL</span>
+                </button>
+                <button class="tab-btn" onclick="switchTab('shows', this)">
+                    <span class="tab-icon">🎤</span><span>SHOWS</span>
+                </button>
+                <button class="tab-btn" onclick="switchTab('clinicas', this)">
+                    <span class="tab-icon">🏥</span><span>CLÍNICAS</span>
+                </button>
+                <button class="tab-btn" onclick="switchTab('eletronicos', this)">
+                    <span class="tab-icon">💻</span><span>ELETRÔN.</span>
+                </button>
+                <button class="tab-btn" onclick="switchTab('contratos', this)">
+                    <span class="tab-icon">📋</span><span>CONTR.</span>
+                </button>
+            </nav>
+
+            <!-- ── CONTENT ── -->
+            <div class="content-area">
+
+                <!-- ════ CORRIDAS ════ -->
+                <div id="panel-corridas" class="section-panel active">
+                    <div class="section-header">
+                        <div class="section-title">🏎️ CORRIDAS</div>
+                    </div>
+
+                    <!-- C01 -->
+                    <div class="job-card" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-id">#C01</div>
+                                <div class="card-title">CORRIDA DE RUA <span class="chevron">▼</span></div>
+                            </div>
+                            <div class="card-reward-badge badge-gold">ATÉ 1.500 eb</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-divider"></div>
+                            <div class="info-row"><span class="info-key">OBJETIVO</span><span class="info-val">Ponto A →
+                                    Ponto B pelas ruas de NV</span></div>
+                            <div class="info-row"><span class="info-key">PONTO A</span><span class="info-val">Praça
+                                    Central — Zona Residencial</span></div>
+                            <div class="info-row"><span class="info-key">PONTO B</span><span class="info-val">Porto
+                                    Industrial de Nova Vitória</span></div>
+                            <div class="info-row"><span class="info-key">REGRAS</span><span
+                                    class="info-val danger-val">Não há regras</span></div>
+                            <div class="info-row"><span class="info-key">COMPETIDORES</span><span
+                                    class="info-val">6</span></div>
+                            <div class="info-row"><span class="info-key">OBS.</span><span class="info-val">Veículos dos
+                                    sobreviventes consertados em até 3 dias</span></div>
+                            <div class="info-row"><span class="info-key">FEE INSCRIÇÃO</span><span
+                                    class="info-val danger-val">500 eb</span></div>
+                            <div class="prize-block">
+                                <div class="prize-label">PREMIAÇÃO</div>
+                                <div class="prize-row prize-first"><span>🥇 1º Lugar</span><span>1.500 eb</span></div>
+                                <div class="prize-row prize-second"><span>🥈 2º Lugar</span><span>1.000 eb</span></div>
+                                <div class="prize-row prize-third"><span>🥉 3º Lugar</span><span>750 eb</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- C02 -->
+                    <div class="job-card" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-id">#C02</div>
+                                <div class="card-title">PILOTO DE FUGA <span class="chevron">▼</span></div>
+                            </div>
+                            <div class="card-reward-badge badge-green">1.000 eb</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-divider"></div>
+                            <div class="info-row"><span class="info-key">OBJETIVO</span><span class="info-val">Ser
+                                    motorista de fuga em uma operação</span></div>
+                            <div class="info-row"><span class="info-key">VEÍCULO</span><span
+                                    class="info-val highlight">Fornecido pelo contratante</span></div>
+                            <div class="info-row"><span class="info-key">PRAZO</span><span class="info-val">Em 3 dias a
+                                    partir do contato</span></div>
+                            <div class="info-row"><span class="info-key">RISCO</span><span class="info-val">Sem
+                                    informação</span></div>
+                            <div class="info-row"><span class="info-key">RECOMPENSA</span><span
+                                    class="info-val highlight">1.000 eb</span></div>
+                            <div class="info-row"><span class="info-key">FEE INSCRIÇÃO</span><span
+                                    class="info-val">Nenhum</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ════ STREET BRAWL ════ -->
+                <div id="panel-brawl" class="section-panel">
+                    <div class="section-header">
+                        <div class="section-title">👊 STREET BRAWL</div>
+                        <div class="section-note">
+                            Torneios Bronze → Prata → Ouro são progressivos.<br>
+                            Regras gerais: Sem armas · Implantes permitidos · Máx. 5 rounds por luta.
+                        </div>
+                    </div>
+
+                    <!-- SB01 -->
+                    <div class="job-card" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-id">#SB01</div>
+                                <div class="card-title">TORNEIO BRONZE <span class="chevron">▼</span></div>
+                            </div>
+                            <div class="card-reward-badge badge-gold">ATÉ 1.250 eb</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-divider"></div>
+                            <div class="info-row"><span class="info-key">REQUISITO</span><span
+                                    class="info-val highlight">Nenhum</span></div>
+                            <div class="info-row"><span class="info-key">COMPETIDORES</span><span
+                                    class="info-val">8</span></div>
+                            <div class="info-row"><span class="info-key">FORMATO</span><span class="info-val">3 lutas
+                                    eliminatórias. Campeão = vencedor de todas.</span></div>
+                            <div class="info-row"><span class="info-key">FEE INSCRIÇÃO</span><span
+                                    class="info-val danger-val">250 eb</span></div>
+                            <div class="prize-block">
+                                <div class="prize-label">PREMIAÇÃO</div>
+                                <div class="prize-row prize-first"><span>🥇 1º Lugar</span><span>1.250 eb</span></div>
+                                <div class="prize-row prize-second"><span>🥈 2º Lugar</span><span>750 eb</span></div>
+                                <div class="prize-row prize-third"><span>🥉 3º Lugar</span><span>500 eb</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SB02 -->
+                    <div class="job-card" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-id">#SB02</div>
+                                <div class="card-title">TORNEIO PRATA <span class="chevron">▼</span></div>
+                            </div>
+                            <div class="card-reward-badge badge-gold">ATÉ 2.000 eb</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-divider"></div>
+                            <div class="locked-badge">🔒 REQUER: Campeão Torneio Bronze</div>
+                            <div class="info-row"><span class="info-key">COMPETIDORES</span><span
+                                    class="info-val">8</span></div>
+                            <div class="info-row"><span class="info-key">FORMATO</span><span class="info-val">3 lutas
+                                    eliminatórias. Campeão = vencedor de todas.</span></div>
+                            <div class="info-row"><span class="info-key">FEE INSCRIÇÃO</span><span
+                                    class="info-val danger-val">500 eb</span></div>
+                            <div class="prize-block">
+                                <div class="prize-label">PREMIAÇÃO</div>
+                                <div class="prize-row prize-first"><span>🥇 1º Lugar</span><span>2.000 eb</span></div>
+                                <div class="prize-row prize-second"><span>🥈 2º Lugar</span><span>1.250 eb</span></div>
+                                <div class="prize-row prize-third"><span>🥉 3º Lugar</span><span>750 eb</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SB03 -->
+                    <div class="job-card gold-card" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-id">#SB03</div>
+                                <div class="card-title">TORNEIO OURO <span class="chevron">▼</span></div>
+                            </div>
+                            <div class="card-reward-badge badge-gold">ATÉ 3.000 eb</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-divider"></div>
+                            <div class="locked-badge">🔒 REQUER: Campeão Torneio Prata</div>
+                            <div class="info-row"><span class="info-key">COMPETIDORES</span><span
+                                    class="info-val">8</span></div>
+                            <div class="info-row"><span class="info-key">FORMATO</span><span class="info-val">3 lutas
+                                    eliminatórias. Campeão = vencedor de todas.</span></div>
+                            <div class="info-row"><span class="info-key">FEE INSCRIÇÃO</span><span
+                                    class="info-val danger-val">1.000 eb</span></div>
+                            <div class="prize-block">
+                                <div class="prize-label">PREMIAÇÃO</div>
+                                <div class="prize-row prize-first"><span>🥇 1º Lugar</span><span>3.000 eb</span></div>
+                                <div class="prize-row prize-second"><span>🥈 2º Lugar</span><span>2.250 eb</span></div>
+                                <div class="prize-row prize-third"><span>🥉 3º Lugar</span><span>1.750 eb</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SB04 SANGUE -->
+                    <div class="job-card danger" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-id">#SB04</div>
+                                <div class="card-title">TORNEIO SANGUE ☠️ <span class="chevron">▼</span></div>
+                            </div>
+                            <div class="card-reward-badge badge-red">2.000 eb</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-divider"></div>
+                            <div class="info-row"><span class="info-key">REQUISITO</span><span
+                                    class="info-val highlight">Nenhum</span></div>
+                            <div class="info-row"><span class="info-key">COMPETIDORES</span><span
+                                    class="info-val">8</span></div>
+                            <div class="info-row"><span class="info-key">FORMATO</span><span
+                                    class="info-val danger-val">3 lutas na noite — até a morte</span></div>
+                            <div class="info-row"><span class="info-key">REGRAS</span><span class="info-val">Sem armas.
+                                    Implantes cibernéticos permitidos.</span></div>
+                            <div class="info-row"><span class="info-key">LOCAL</span><span class="info-val">Bunker
+                                    subterrâneo — localização enviada 1h antes</span></div>
+                            <div class="info-row"><span class="info-key">DATA</span><span class="info-val">Irregular —
+                                    aguarde comunicado</span></div>
+                            <div class="info-row"><span class="info-key">FEE INSCRIÇÃO</span><span
+                                    class="info-val danger-val">500 eb</span></div>
+                            <div class="info-row"><span class="info-key">RECOMPENSA</span><span
+                                    class="info-val danger-val">2.000 eb — ao sobrevivente</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ════ SHOWS ════ -->
+                <div id="panel-shows" class="section-panel">
+                    <div class="section-header">
+                        <div class="section-title">🎤 SHOWS</div>
+                        <div class="section-note">
+                            Aluguel de espaço. Ingresso médio: 50 eb (definido pelo contratante).<br>
+                            Aceito: bandas · DJs · combates performáticos · poesia cyberpunk.<br>
+                            Segurança NÃO inclusa — contratar à parte.
+                        </div>
+                    </div>
+
+                    <!-- SH01 -->
+                    <div class="job-card" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-id">#SH01</div>
+                                <div class="card-title">CIRCUITO ZERO <span class="chevron">▼</span></div>
+                            </div>
+                            <div class="card-reward-badge badge-mag">6.500 eb</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-divider"></div>
+                            <div class="info-row"><span class="info-key">CAPACIDADE</span><span class="info-val">Até 200
+                                    pessoas</span></div>
+                            <div class="info-row"><span class="info-key">ANTECEDÊNCIA</span><span class="info-val">3
+                                    dias</span></div>
+                            <div class="info-row"><span class="info-key">ALUGUEL</span><span
+                                    class="info-val danger-val">6.500 eb</span></div>
+                            <div class="info-row"><span class="info-key">POTENCIAL (50 eb/ing.)</span><span
+                                    class="info-val highlight">Até 10.000 eb</span></div>
+                        </div>
+                    </div>
+
+                    <!-- SH02 -->
+                    <div class="job-card" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-id">#SH02</div>
+                                <div class="card-title">BLACK GRID LOUNGE <span class="chevron">▼</span></div>
+                            </div>
+                            <div class="card-reward-badge badge-mag">9.500 eb</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-divider"></div>
+                            <div class="info-row"><span class="info-key">CAPACIDADE</span><span class="info-val">Até 300
+                                    pessoas</span></div>
+                            <div class="info-row"><span class="info-key">ANTECEDÊNCIA</span><span class="info-val">3
+                                    dias</span></div>
+                            <div class="info-row"><span class="info-key">ALUGUEL</span><span
+                                    class="info-val danger-val">9.500 eb</span></div>
+                            <div class="info-row"><span class="info-key">POTENCIAL (50 eb/ing.)</span><span
+                                    class="info-val highlight">Até 15.000 eb</span></div>
+                        </div>
+                    </div>
+
+                    <!-- SH03 -->
+                    <div class="job-card gold-card" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-id">#SH03</div>
+                                <div class="card-title">CHROMÁTICA <span class="chevron">▼</span></div>
+                            </div>
+                            <div class="card-reward-badge badge-mag">15.500 eb</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-divider"></div>
+                            <div class="info-row"><span class="info-key">CAPACIDADE</span><span class="info-val">Até 500
+                                    pessoas</span></div>
+                            <div class="info-row"><span class="info-key">ANTECEDÊNCIA</span><span class="info-val">4
+                                    dias</span></div>
+                            <div class="info-row"><span class="info-key">ALUGUEL</span><span
+                                    class="info-val danger-val">15.500 eb</span></div>
+                            <div class="info-row"><span class="info-key">POTENCIAL (50 eb/ing.)</span><span
+                                    class="info-val highlight">Até 25.000 eb</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ════ CLÍNICAS ════ -->
+                <div id="panel-clinicas" class="section-panel">
+                    <div class="section-header">
+                        <div class="section-title">🏥 CLÍNICAS DE SAÚDE</div>
+                    </div>
+
+                    <!-- CS01 -->
+                    <div class="job-card" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-id">#CS01</div>
+                                <div class="card-title">HOSPITAL DE NOVA VITÓRIA <span class="chevron">▼</span></div>
+                            </div>
+                            <div class="card-reward-badge badge-green">1.000 eb</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-divider"></div>
+                            <div class="info-row"><span class="info-key">TIPO</span><span class="info-val">Plantão
+                                    Médico</span></div>
+                            <div class="info-row"><span class="info-key">DURAÇÃO</span><span class="info-val">36
+                                    horas</span></div>
+                            <div class="info-row"><span class="info-key">PACIENTES</span><span class="info-val">Traumas
+                                    comuns e civis</span></div>
+                            <div class="info-row"><span class="info-key">RISCO</span><span
+                                    class="info-val highlight">Baixo — área razoavelmente segura</span></div>
+                            <div class="info-row"><span class="info-key">RECOMPENSA</span><span
+                                    class="info-val highlight">1.000 eb (fixo)</span></div>
+                        </div>
+                    </div>
+
+                    <!-- CS02 -->
+                    <div class="job-card" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-id">#CS02</div>
+                                <div class="card-title">MEDTECH SOLUTIONS <span class="chevron">▼</span></div>
+                            </div>
+                            <div class="card-reward-badge badge-green">ATÉ 2.000 eb</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-divider"></div>
+                            <div class="info-row"><span class="info-key">TIPO</span><span class="info-val">Plantão
+                                    Médico — Corporativo</span></div>
+                            <div class="info-row"><span class="info-key">DURAÇÃO</span><span class="info-val">36
+                                    horas</span></div>
+                            <div class="info-row"><span class="info-key">PACIENTES</span><span
+                                    class="info-val">Executivos e seguranças corporativos</span></div>
+                            <div class="info-row"><span class="info-key">RISCO</span><span class="info-val"
+                                    style="color:var(--gold)">Médio — exposição a informações confidenciais</span></div>
+                            <div class="info-row"><span class="info-key">RECOMPENSA</span><span class="info-val">500
+                                    eb/paciente</span></div>
+                            <div class="info-row"><span class="info-key">FEE CLÍNICA</span><span
+                                    class="info-val danger-val">50%</span></div>
+                            <div class="info-row"><span class="info-key">GANHO LÍQUIDO</span><span
+                                    class="info-val highlight">250 eb/paciente</span></div>
+                            <div class="info-row"><span class="info-key">MÉDIA PACIENTES</span><span class="info-val">1
+                                    a 8 (pot.: 250 – 2.000 eb)</span></div>
+                        </div>
+                    </div>
+
+                    <!-- CS03 -->
+                    <div class="job-card danger" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-id">#CS03</div>
+                                <div class="card-title">RIP & GO — RIPPERDOC <span class="chevron">▼</span></div>
+                            </div>
+                            <div class="card-reward-badge badge-green">ATÉ 1.680 eb</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-divider"></div>
+                            <div class="info-row"><span class="info-key">TIPO</span><span class="info-val">Plantão —
+                                    Ripperdoc</span></div>
+                            <div class="info-row"><span class="info-key">DURAÇÃO</span><span class="info-val">36
+                                    horas</span></div>
+                            <div class="info-row"><span class="info-key">PACIENTES</span><span class="info-val">Clientes
+                                    das ruas, gangues e mercenários</span></div>
+                            <div class="info-row"><span class="info-key">RISCO</span><span
+                                    class="info-val danger-val">Alto — pressão para trabalho não-registrado</span></div>
+                            <div class="info-row"><span class="info-key">RECOMPENSA BRUTA</span><span
+                                    class="info-val">50 eb/paciente</span></div>
+                            <div class="info-row"><span class="info-key">FEE CLÍNICA</span><span
+                                    class="info-val danger-val">15%</span></div>
+                            <div class="info-row"><span class="info-key">GANHO LÍQUIDO</span><span
+                                    class="info-val highlight">~42 eb/paciente</span></div>
+                            <div class="info-row"><span class="info-key">MÉDIA PACIENTES</span><span class="info-val">10
+                                    a 40 (pot.: ~420 – ~1.680 eb)</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ════ ELETRÔNICOS ════ -->
+                <div id="panel-eletronicos" class="section-panel">
+                    <div class="section-header">
+                        <div class="section-title">💻 ELETRÔNICOS</div>
+                    </div>
+
+                    <!-- EL01 -->
+                    <div class="job-card" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-id">#EL01</div>
+                                <div class="card-title">LIMPEZA DE SERIAL NUMBER <span class="chevron">▼</span></div>
+                            </div>
+                            <div class="card-reward-badge badge-green">3.000 eb</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-divider"></div>
+                            <div class="info-row"><span class="info-key">OBJETIVO</span><span
+                                    class="info-val">Descriptografar/limpar nº de série de dispositivos absolutamente
+                                    lícitos</span></div>
+                            <div class="info-row"><span class="info-key">DURAÇÃO</span><span class="info-val">48
+                                    horas</span></div>
+                            <div class="info-row"><span class="info-key">DISPOSITIVOS</span><span class="info-val">30
+                                    unidades</span></div>
+                            <div class="info-row"><span class="info-key">RECOMPENSA</span><span class="info-val">100 eb
+                                    por dispositivo</span></div>
+                            <div class="info-row"><span class="info-key">POTENCIAL TOTAL</span><span
+                                    class="info-val highlight">3.000 eb</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ════ CONTRATOS ════ -->
+                <div id="panel-contratos" class="section-panel">
+                    <div class="section-header">
+                        <div class="section-title">📋 CONTRATOS</div>
+                    </div>
+
+                    <!-- CT01 -->
+                    <div class="job-card danger" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-id">#CT01</div>
+                                <div class="card-title">ASSASSINATO <span class="chevron">▼</span></div>
+                            </div>
+                            <div class="card-reward-badge badge-red">2.500 eb</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-divider"></div>
+                            <div class="info-row"><span class="info-key">ALVO</span><span class="info-val danger-val">Nó
+                                    Morto — Trilharede, favela de NV</span></div>
+                            <div class="info-row"><span class="info-key">OBJETIVO</span><span
+                                    class="info-val">Neutralização completa + destruição dos equipamentos</span></div>
+                            <div class="info-row"><span class="info-key">PRAZO</span><span class="info-val">7 dias a
+                                    partir do aceite</span></div>
+                            <div class="info-row"><span class="info-key">COMPROVAÇÃO</span><span class="info-val">Foto
+                                    do corpo + componentes do deck destruídos</span></div>
+                            <div class="info-row"><span class="info-key">RECOMPENSA</span><span
+                                    class="info-val highlight">2.500 eb</span></div>
+                        </div>
+                    </div>
+
+                    <!-- CT02 -->
+                    <div class="job-card gold-card" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-id">#CT02</div>
+                                <div class="card-title">RESGATE — ALTO ESCALÃO <span class="chevron">▼</span></div>
+                            </div>
+                            <div class="card-reward-badge badge-gold">2.500 eb</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-divider"></div>
+                            <div class="info-row"><span class="info-key">NÍVEL</span><span
+                                    class="info-val gold-val">Alto escalão — contrato corporativo</span></div>
+                            <div class="info-row"><span class="info-key">OBJETIVO</span><span class="info-val">Resgatar
+                                    filha de executivo corporativo</span></div>
+                            <div class="info-row"><span class="info-key">ALVO</span><span class="info-val">Yara
+                                    Mitsui</span></div>
+                            <div class="info-row"><span class="info-key">CONTRATANTE</span><span
+                                    class="info-val gold-val">Exec. Diretor Mitsui</span></div>
+                            <div class="info-row"><span class="info-key">SITUAÇÃO</span><span class="info-val">Yara
+                                    desapareceu há 1 semana após ingressar em grupo fanático</span></div>
+                            <div class="info-row"><span class="info-key">GRUPO</span><span
+                                    class="info-val danger-val">Os Filhos do Sinal</span></div>
+                            <div class="info-row"><span class="info-key">PRAZO</span><span class="info-val">5
+                                    dias</span></div>
+                            <div class="info-row"><span class="info-key">RECOMPENSA</span><span
+                                    class="info-val highlight">2.500 eb</span></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /content-area -->
+
+            <!-- Ticker -->
+            <div class="ticker-wrap">
+                <span class="ticker">
+                    ⚡ NOVA VITÓRIA NETWORK &nbsp;|&nbsp; 15 OPORTUNIDADES ATIVAS &nbsp;|&nbsp; CONEXÃO CRIPTOGRAFADA
+                    &nbsp;//&nbsp; ATENÇÃO: uso indevido desta rede é crime corporativo &nbsp;|&nbsp; GARÇA-JOBS v2.4
+                    &nbsp;|&nbsp; ⚡ NOVA VITÓRIA NETWORK
+                </span>
+            </div>
+
+            <!-- Footer -->
+            <div class="device-footer">
+                <span>NV-OS 7.1</span>
+                <div class="signal-bars">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
+                <span id="clock">--:--</span>
+            </div>
+
+        </div><!-- /device -->
+    </div><!-- /device-wrap -->
+
+    <script>
+        function switchTab(panelId, btn) {
+            document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('panel-' + panelId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function toggleCard(card) {
+            const body = card.querySelector('.card-body');
+            const isOpen = body.classList.contains('open');
+            card.closest('.section-panel').querySelectorAll('.card-body').forEach(b => b.classList.remove('open'));
+            card.closest('.section-panel').querySelectorAll('.job-card').forEach(c => c.classList.remove('expanded'));
+            if (!isOpen) {
+                body.classList.add('open');
+                card.classList.add('expanded');
+            }
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('clock').textContent = h + ':' + m;
+        }
+        updateClock();
+        setInterval(updateClock, 5000);
+
+        document.getElementById('boot-screen').addEventListener('animationend', function () {
+            this.style.display = 'none';
+        });
+    </script>
+</body>
+
+</html>
